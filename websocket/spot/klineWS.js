@@ -10,29 +10,41 @@ const logger = new Console({
   stderr: errorOutput
 })
 
-const client = new Spot(env.BINANCE_API_KEY, env.BINANCE_SECRET_KEY, {
-  logger
-})
-
-const callbacks = {
-  open: () => onOpen(),
-  close: () => onClose(),
-  message: data => onMessage(data)
-}
-
-const wsRef = client.klineWS('BTCUSDT', '1m', callbacks)
 // setTimeout(() => client.unsubscribe(wsRef), 5000)
 // check the output file
-
 function onOpen(){
-  console.log("OPEN aggTradeWS")
+  console.log("OPEN klineWS")
 }
 
 function onClose(){
-  console.log("CLOSE aggTradeWS")
+  console.log("CLOSE klineWS")
 }
 
 function onMessage(data){
   // String.
-  console.log(String(data))
+  // console.log(String(data))
+}
+
+
+
+module.exports = (callback) => {
+  const client = new Spot(env.BINANCE_API_KEY, env.BINANCE_SECRET_KEY, {
+    logger
+  })
+
+  const callbacks = {
+    open: () => onOpen(),
+    close: () => onClose(),
+    message: data => {
+      // console.log((typeof callback))
+      callback(data)
+      // if ((typeof onData) == "function"){
+      //   console.log("ddd")
+      //   onData(data)
+      // }
+      onMessage(data)
+    }
+  }
+
+  const wsRef = client.klineWS('BTCUSDT', '1m', callbacks)
 }
